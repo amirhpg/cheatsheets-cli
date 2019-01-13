@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 import urllib.request
 import re
+
 # from setuptools import setup
 
 
@@ -14,74 +15,88 @@ import re
 @click.argument('name')
 def main(link, name):
     website = "http://overapi.com/"
-    dlpage = website+name
-    content = urllib.request.urlopen(dlpage).read()
-    soup = BeautifulSoup(content, 'lxml')
-    title = soup.title.string
-    a = soup.find_all("a", href=True)
-    i = 1
-    othercheatsheetsindicator = 0
-    downloadcompleteindicator = 0
-    for value in a:
-        if value['href'].endswith(".pdf"):
-            p = re.compile('^(?!http://.*$).*')
-            if p.match(value['href']):
-                fileurl = "http://overapi.com"+value['href']
-                filename = value['href'].rsplit('/')[-1]
-                if os.path.isfile(filename):
-                    print(filename+" already exist! ☉")
-                    i+=1
-                else:
-                    if i == link :
-                         print("[ "+str(i)+" ] "+fileurl+" [Downloading] ⌛")
-                         download(fileurl,filename)
-                         if os.path.isfile(filename):
-                             print("\nDownload completed successfully ✓")
-                             downloadcompleteindicator+=1
-                         else:
-                            print("error ✗")
+    if name == "list":
+        contentlist = urllib.request.urlopen(website).read()
+        souplist = BeautifulSoup(contentlist,"lxml")
+        souplistsections = souplist.find_all("div","index-more-cheat")
+        print("""
+                            Availble Cheat Sheets
+        --------------------------------------------------------------
+        """)
+        for cheatnames in souplistsections:
+            cheatlinks = cheatnames.find_all("a")
+            for cheatsmainname in cheatlinks:
+                print(cheatsmainname.string)
 
-                         i+=1
+    else:
+        dlpage = website+name
+        content = urllib.request.urlopen(dlpage).read()
+        soup = BeautifulSoup(content, 'lxml')
+        title = soup.title.string
+        a = soup.find_all("a", href=True)
+        i = 1
+        othercheatsheetsindicator = 0
+        downloadcompleteindicator = 0
+        for value in a:
+            if value['href'].endswith(".pdf"):
+                p = re.compile('^(?!http://.*$).*')
+                if p.match(value['href']):
+                    fileurl = "http://overapi.com"+value['href']
+                    filename = value['href'].rsplit('/')[-1]
+                    if os.path.isfile(filename):
+                        print(filename+" already exist! ☉")
+                        i+=1
                     else:
-                        if downloadcompleteindicator != 0:
-                            if othercheatsheetsindicator == 0:
-                                print("\n")
-                                print("+----------------------------------------------------+")
-                                print("|            Other availble cheetsheets              |")
-                                print("+----------------------------------------------------+")
-                                othercheatsheetsindicator+=1;
+                        if i == link :
+                            print("[ "+str(i)+" ] "+fileurl+" [Downloading] ⌛")
+                            download(fileurl,filename)
+                            if os.path.isfile(filename):
+                                print("\nDownload completed successfully ✓")
+                                downloadcompleteindicator+=1
+                            else:
+                                print("error ✗")
 
-                            print("[ "+str(i)+" ] "+fileurl)
+                            i+=1
+                        else:
+                            if downloadcompleteindicator != 0:
+                                if othercheatsheetsindicator == 0:
+                                    print("\n")
+                                    print("+----------------------------------------------------+")
+                                    print("|            Other availble cheetsheets              |")
+                                    print("+----------------------------------------------------+")
+                                    othercheatsheetsindicator+=1;
+
+                                print("[ "+str(i)+" ] "+fileurl)
+                                
+                            i+=1
+                else:
+                    fileurl = value['href']
+                    filename = value['href'].rsplit('/')[-1]
+                    if os.path.isfile(filename):
+                        print(filename+" already exist! ☉")
+                        i+=1
+                    else:
+                        if i == link :
+                            print("[ "+str(i)+" ] "+fileurl+" [Downloading] ⌛")
+                            download(fileurl,filename)
+                            if os.path.isfile(filename):
+                                print("\nDownload completed successfully ✓")
+                                downloadcompleteindicator+=1
+                            else:
+                                print("error ✗")
+                            i+=1
+                        else:
+                            if downloadcompleteindicator != 0:
+                                if othercheatsheetsindicator == 0:
+                                    print("\n")
+                                    print("+----------------------------------------------------+")
+                                    print("|            Other availble cheetsheets              |")
+                                    print("+----------------------------------------------------+")
+                                    othercheatsheetsindicator+=1;
+
+                                print("[ "+str(i)+" ] "+fileurl)
                             
-                        i+=1
-            else:
-                fileurl = value['href']
-                filename = value['href'].rsplit('/')[-1]
-                if os.path.isfile(filename):
-                    print(filename+" already exist! ☉")
-                    i+=1
-                else:
-                    if i == link :
-                         print("[ "+str(i)+" ] "+fileurl+" [Downloading] ⌛")
-                         download(fileurl,filename)
-                         if os.path.isfile(filename):
-                             print("\nDownload completed successfully ✓")
-                             downloadcompleteindicator+=1
-                         else:
-                            print("error ✗")
-                         i+=1
-                    else:
-                        if downloadcompleteindicator != 0:
-                            if othercheatsheetsindicator == 0:
-                                print("\n")
-                                print("+----------------------------------------------------+")
-                                print("|            Other availble cheetsheets              |")
-                                print("+----------------------------------------------------+")
-                                othercheatsheetsindicator+=1;
-
-                            print("[ "+str(i)+" ] "+fileurl)
-                        
-                        i+=1
+                            i+=1
 
 
 
@@ -104,7 +119,7 @@ def download(url, filename):
     sys.stdout.write('\n')
 
 
-# TODO: user should can download the links 
+# TODO: user should can download the links [Done]
 # TODO: show all avalible cheetsheets
 # TODO: add other sources - optional-
 # TODO: convert pdf to text file - optional -

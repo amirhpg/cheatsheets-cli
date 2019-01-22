@@ -17,8 +17,8 @@ then <pre>sudo pip3.7 install beautifulsoup4</pre>
  
  it brings specifct cheat that you passed in argument
  <br>
-<pre>./cheatsheets.py [cheatname] </pre>
+<pre>./cheatsheets [cheatname] </pre>
 
 it bring list of avalible cheatsheets
 <br>
-<pre>./cheatsheets.py list </pre>
+<pre>./cheatsheets list </pre>
